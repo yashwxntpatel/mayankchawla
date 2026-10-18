@@ -4,14 +4,18 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
   type ErrorComponentProps,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { Header } from "@/components/site/Header";
+import { Footer } from "@/components/site/Footer";
+import { ensureGsap, prefersReduced } from "@/lib/motion";
 
 function NotFoundComponent() {
   return (
@@ -78,20 +82,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "MAYANKCHAWLA Menswear" },
+      { name: "description", content: "Indian designer menswear from New Delhi. Couture tuxedos, bandhgalas and indowesterns." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Anton&family=Jost:wght@300;400;500&display=swap" },
+      { rel: "preconnect", href: "https://img.perniaspopupshop.com" },
+      { rel: "stylesheet", href: appCss },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
   }),
@@ -117,11 +118,31 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const path = useRouterState({ select: (s) => s.location.pathname });
+  const main = useRef<HTMLElement>(null);
+  const curtain = useRef<HTMLDivElement>(null);
+  const first = useRef(true);
+
+  useEffect(() => {
+    if (first.current) { first.current = false; return; }
+    window.scrollTo(0, 0);
+    if (prefersReduced()) return;
+    const { gsap, ScrollTrigger } = ensureGsap();
+    const tl = gsap.timeline({ onComplete: () => ScrollTrigger.refresh() });
+    tl.set(curtain.current, { display: "block", yPercent: 0 })
+      .to(curtain.current, { yPercent: -100, duration: 1.1, ease: "expo.inOut" })
+      .fromTo(main.current, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 1, ease: "expo.out" }, 0.35)
+      .set(curtain.current, { display: "none" });
+  }, [path]);
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <Header />
+      <main ref={main}>
+        <Outlet />
+      </main>
+      <Footer />
+      <div ref={curtain} aria-hidden className="pointer-events-none fixed inset-0 z-[60] hidden bg-ink" />
     </QueryClientProvider>
   );
 }
