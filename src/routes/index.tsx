@@ -166,7 +166,7 @@ function Home() {
             <Link data-reveal to="/shop" className="btn-lux">Enter the Shop</Link>
           </div>
           <div data-stagger className="mt-16 grid grid-cols-2 gap-x-4 gap-y-12 md:gap-x-6 lg:grid-cols-4">
-            {selected.map((p, i) => <ProductCard key={p.slug} p={p} signature={i === 0} />)}
+            {selected.filter((p): p is NonNullable<typeof p> => !!p).map((p, i) => <ProductCard key={p.slug} p={p} signature={i === 0} />)}
           </div>
         </div>
       </section>

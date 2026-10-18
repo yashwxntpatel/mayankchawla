@@ -23,7 +23,7 @@ function Journal() {
   useScrollMotion(scope);
   return (
     <div ref={scope}>
-      <PageHero eyebrow="Journal" title="Notes from the Atelier" image={images.journal[1]} />
+      <PageHero eyebrow="Journal" title="Notes from the Atelier" image={images.journal[1] ?? images.hero} />
       <section className="section-pad bg-paper">
         <div className="container-lux space-y-28 md:space-y-40">
           {journal.map((j, i) => (

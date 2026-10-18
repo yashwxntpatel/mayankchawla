@@ -46,7 +46,7 @@ export function useScrollMotion(scope: RefObject<HTMLElement | null>, deps: unkn
         if (img) tl.fromTo(img, { scale: 1.25 }, { scale: 1, duration: 2, ease: "expo.out" }, 0);
       });
       gsap.utils.toArray<HTMLElement>("[data-parallax]").forEach((n) => {
-        const amt = Number(n.dataset.parallax || 8);
+        const amt = Number(n.dataset["parallax"] || 8);
         gsap.fromTo(n, { yPercent: -amt / 2 }, {
           yPercent: amt / 2, ease: "none",
           scrollTrigger: { trigger: n.parentElement ?? n, start: "top bottom", end: "bottom top", scrub: true },
